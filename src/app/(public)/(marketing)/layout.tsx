@@ -1,7 +1,13 @@
-export default function layout() {
+import Footer from "@/components/layout/public/Footer";
+import Header from "@/components/layout/public/Header";
+import type { ReactNode } from "react";
+
+export default function layout({ children }: { children: ReactNode }) {
   return (
-    <div>
-      <h1>This is public components</h1>
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-1">{children}</main>
+      <Footer />
     </div>
   );
 }
