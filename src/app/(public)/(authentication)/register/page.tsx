@@ -42,7 +42,7 @@ export default function RegisterPage() {
             <div className="relative z-10 flex items-center gap-2.5 p-8 pb-4">
               <div className="relative h-15 w-15">
                 <Image
-                  src="/logo1.png"
+                  src="/medisync-logo.png"
                   alt="MediSync"
                   fill
                   className="object-contain object-left"

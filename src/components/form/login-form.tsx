@@ -13,20 +13,49 @@ import { useState } from "react";
 import { Eye, EyeClosed } from "lucide-react";
 import Link from "next/link";
 import { loginSchema } from "@/validation";
+import { useLogin } from "@/hooks";
+import { useRouter } from "next/navigation";
+import { toast } from "../ui/toast";
+import { Spinner } from "../ui/spinner";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const { mutate: login, isPending: loginPending } = useLogin();
+
+  const router = useRouter();
 
   const form = useForm({
     defaultValues: {
-      email: "",
-      password: "",
+      email: "superadmin@gmail.com",
+      password: "Super@dmin12345",
     },
     validators: {
       onSubmit: loginSchema,
     },
     onSubmit: ({ value }) => {
-      console.log(value);
+      const loginData = {
+        email: value.email,
+        password: value.password,
+      };
+
+      login(loginData, {
+        onSuccess: (res) => {
+          toast.add({
+            title: "Login Success",
+            description: "Welcome Back",
+            type: "success",
+          });
+          router.push("/");
+        },
+        onError: (err) => {
+          toast.add({
+            title: "Authorization Failure",
+            description:
+              err.message || "Something went Wrong, Please try again",
+            type: "error",
+          });
+        },
+      });
     },
   });
 
@@ -137,10 +166,17 @@ export default function LoginForm() {
 
         {/* Sign In Button */}
         <Button
+          disabled={loginPending}
           type="submit"
           className="mt-2 h-11 w-full rounded-lg bg-[#3b82f6] text-[15px] font-medium text-white hover:bg-[#2563eb] shadow-md shadow-blue-500/20"
         >
-          Sign In
+          {loginPending ? (
+            <>
+              <Spinner /> Signing
+            </>
+          ) : (
+            " Sign In"
+          )}
         </Button>
 
         {/* Footer link */}
