@@ -6,3 +6,16 @@ export function userLogin(payload: { email: string; password: string }) {
     body: payload,
   });
 }
+export function userLogout() {
+  return apiClient("/auth/logout", {
+    method: "POST",
+  });
+}
+export function getMe() {
+  return apiClient("/auth/me");
+}
+export function googleOAuth(payload: { idToken: string }) {
+  return apiClient("/auth/goolge", {
+    body: payload,
+  });
+}

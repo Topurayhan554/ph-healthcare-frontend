@@ -8,6 +8,7 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldSeparator,
 } from "@/components/ui/field";
 import { useState } from "react";
 import { Eye, EyeClosed } from "lucide-react";
@@ -17,6 +18,7 @@ import { useLogin } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "../ui/toast";
 import { Spinner } from "../ui/spinner";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -189,6 +191,9 @@ export default function LoginForm() {
           </Link>
         </p>
       </form>
+
+      <FieldSeparator>Or</FieldSeparator>
+      <GoogleLogin onSuccess={() => {}} onError={() => {}} />
     </div>
   );
 }
