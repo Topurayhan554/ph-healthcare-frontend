@@ -1,53 +1,40 @@
 import z from "zod";
 
 export const loginSchema = z.object({
-  email: z.email("Please enter a valid email address."),
+  email: z.email("Not email!!"),
   password: z
     .string()
-    .min(1, "Password is required.")
-    .min(8, "Password must be at least 8 characters long."),
+    .min(8, "Password Must Minimum 8 Characters Long.")
+    .regex(/[a-z]/, "Password must contain atleast 1 Lowercase Letter")
+    .regex(/[A-Z]/, "Password must contain atleast 1 Uppercase Letter")
+    .regex(/[0-9]/, "Password must contain atleast 1 Number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain atleast 1 Special Character"),
 });
+
 export const signupSchema = z
   .object({
-    fullName: z.string().min(1, "Full name is required."),
-    email: z.email("Please enter a valid email address."),
+    fullName: z
+      .string()
+      .min(3, "Name must atleast 3 characters long!!!")
+      .max(100),
+    email: z.email("Not email!!"),
     phoneNumber: z
       .string()
       .min(1, "Phone number is required.")
-      .regex(/^\+?[0-9]{10,15}$/, "Please enter a valid phone number."),
+      .regex(
+        /^(?:\+?880|0)1[3-9]\d{8}$/,
+        "Please enter a valid Bangladeshi phone number.",
+      ),
     password: z
       .string()
-      .min(8, "Password must be at least 8 characters long.")
-      .superRefine((value, ctx) => {
-        if (!/[a-z]/.test(value)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must contain at least 1 lowercase letter.",
-          });
-          return;
-        }
-        if (!/[A-Z]/.test(value)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must contain at least 1 uppercase letter.",
-          });
-          return;
-        }
-        if (!/[0-9]/.test(value)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must contain at least 1 number.",
-          });
-          return;
-        }
-        if (!/[^A-Za-z0-9]/.test(value)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must contain at least 1 special character.",
-          });
-          return;
-        }
-      }),
+      .min(8, "Password Must Minimum 8 Characters Long.")
+      .regex(/[a-z]/, "Password must contain atleast 1 Lowercase Letter")
+      .regex(/[A-Z]/, "Password must contain atleast 1 Uppercase Letter")
+      .regex(/[0-9]/, "Password must contain atleast 1 Number")
+      .regex(
+        /[^A-Za-z0-9]/,
+        "Password must contain atleast 1 Special Character",
+      ),
     confirmPassword: z.string().min(1, "Please confirm your password."),
   })
   .superRefine((data, ctx) => {

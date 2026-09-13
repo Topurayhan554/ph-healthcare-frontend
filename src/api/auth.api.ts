@@ -1,7 +1,14 @@
 import apiClient from "@/lib/apiClient";
+import { RegistrationPayload } from "@/types";
 
 export function userLogin(payload: { email: string; password: string }) {
   return apiClient("/auth/login", {
+    method: "POST",
+    body: payload,
+  });
+}
+export function userRegistration(payload: RegistrationPayload) {
+  return apiClient("/auth/register", {
     method: "POST",
     body: payload,
   });

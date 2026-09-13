@@ -15,10 +15,16 @@ import { Eye, EyeClosed } from "lucide-react";
 import Link from "next/link";
 import { signupSchema } from "@/validation";
 import GoogleLoginButton from "../modules/google-login/googleLoginButton";
+import { useRegistration } from "@/hooks";
+import { toast } from "../ui/toast";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const router = useRouter();
+  const { mutate: registration } = useRegistration();
 
   const form = useForm({
     defaultValues: {
@@ -32,7 +38,43 @@ export default function RegisterForm() {
       onSubmit: signupSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value);
+      const registrationData = {
+        name: value.fullName,
+        email: value.email,
+        password: value.password,
+        patient: {
+          contactNumber: value.phoneNumber,
+        },
+      };
+
+      registration(registrationData, {
+        onSuccess: (res) => {
+          if (!res.success) {
+            toast.add({
+              title: "Server Failure",
+              description: "Something went wrong. Please try again",
+              type: "error",
+            });
+            return;
+          }
+
+          toast.add({
+            title: "Registration Successfully",
+            description: "Please verify your email",
+            type: "success",
+          });
+
+          const params = new URLSearchParams({ email: registrationData.email });
+          router.push(`/register/verify-account?${params.toString()}`);
+        },
+        onError: (err) => {
+          toast.add({
+            title: "Authorization Failure",
+            description: err.message || "",
+            type: "error",
+          });
+        },
+      });
     },
   });
 
