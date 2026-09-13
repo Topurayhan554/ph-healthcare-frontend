@@ -22,21 +22,17 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen w-full bg-white relative overflow-hidden">
       <div className="relative z-10 flex min-h-screen items-center justify-center p-4 sm:p-6 lg:p-10">
-        <div className="flex w-full max-w-5xl overflow-hidden rounded-[28px] bg-white shadow-2xl">
-          {/*  LEFT PANEL — full-bleed video background  */}
-          <div className="relative hidden w-1/2 flex-col overflow-hidden lg:flex">
-            {/* Video fills the entire panel */}
-            <video
-              src="/istockphoto-1294649728-640_adpp_is.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 h-full w-full object-cover"
+        <div className="flex w-full max-w-7xl overflow-hidden rounded-[28px] bg-white shadow-2xl">
+          {/*  LEFT PANEL*/}
+          <div className="relative hidden lg:flex lg:w-[55%] flex-col overflow-hidden">
+            {/* Image fills the entire panel */}
+            <Image
+              src="/doctors1.jpg"
+              alt=""
+              fill
+              className="object-cover"
+              priority
             />
-
-            {/* Dark overlay so logo/text stay readable over any footage */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/60" />
 
             {/* Logo — top left */}
             <div className="relative z-10 flex items-center gap-2.5 p-8 pb-4">
@@ -51,7 +47,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Heading text overlaid on the video */}
+            {/* Heading text overlaid on the image */}
             <div className="relative z-10 flex flex-1 flex-col justify-end px-9 pb-16">
               <p className="text-[13px] font-medium text-white/80">
                 Join MediSync
@@ -69,8 +65,8 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          {/*  RIGHT PANEL  */}
-          <div className="flex w-full flex-col bg-[#f7f9fc] lg:w-1/2">
+          {/*  RIGHT PANEL */}
+          <div className="flex w-full flex-col bg-[#f7f9fc] lg:w-[45%]">
             <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 sm:px-14">
               {/* Form Card — slightly more spacious than Login */}
               <div className="w-full max-w-[380px] rounded-2xl bg-white p-9 shadow-[0_8px_30px_rgb(0,0,0,0.06)]">

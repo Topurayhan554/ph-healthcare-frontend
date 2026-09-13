@@ -14,22 +14,21 @@ import { useState } from "react";
 import { Eye, EyeClosed } from "lucide-react";
 import Link from "next/link";
 import { loginSchema } from "@/validation";
-import { useGoogleOAuth, useLogin } from "@/hooks";
+import { useLogin } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "../ui/toast";
 import { Spinner } from "../ui/spinner";
-import { GoogleLogin } from "@react-oauth/google";
+import GoogleLoginButton from "../modules/google-login/googleLoginButton";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { mutate: login, isPending: loginPending } = useLogin();
-  const { mutate: googleLogin } = useGoogleOAuth();
   const router = useRouter();
 
   const form = useForm({
     defaultValues: {
-      email: "superadmin@gmail.com",
-      password: "Super@dmin12345",
+      email: "",
+      password: "",
     },
     validators: {
       onSubmit: loginSchema,
@@ -41,7 +40,7 @@ export default function LoginForm() {
       };
 
       login(loginData, {
-        onSuccess: (res) => {
+        onSuccess: () => {
           toast.add({
             title: "Login Success",
             description: "Welcome Back",
@@ -61,57 +60,6 @@ export default function LoginForm() {
     },
   });
 
-  const handleGoogleSuccess = (credentialResponse: { credential?: string }) => {
-    const idToken = credentialResponse.credential;
-
-    if (!idToken) {
-      toast.add({
-        title: "Google OAuth Failed",
-        description: "Something went wrong. Please try again",
-        type: "error",
-      });
-      return;
-    }
-
-    googleLogin(
-      { idToken },
-      {
-        onSuccess: () => {
-          toast.add({
-            title: "Logged In Successfully",
-            description: "Welcome Back!",
-            type: "success",
-          });
-          router.push("/");
-        },
-        onError: (err) => {
-          toast.add({
-            title: "Google OAuth Failed",
-            description:
-              err.message || "Something went wrong. Please try again",
-            type: "error",
-          });
-        },
-      },
-    );
-
-    if (!credentialResponse.credential) {
-      toast.add({
-        title: "Google OAuth Failed",
-        description: "Something went wrong. Please try again",
-        type: "error",
-      });
-    }
-  };
-
-  const handleGoogleError = () => {
-    toast.add({
-      title: "Google OAuth Failed",
-      description: "Something went wrong. Please try again",
-      type: "error",
-    });
-  };
-
   return (
     <div>
       <form
@@ -119,9 +67,9 @@ export default function LoginForm() {
           e.preventDefault();
           form.handleSubmit();
         }}
-        className="space-y-5  "
+        className="space-y-4"
       >
-        <FieldGroup>
+        <FieldGroup className="gap-3">
           {/* Email */}
           <form.Field name="email">
             {(field) => {
@@ -146,7 +94,7 @@ export default function LoginForm() {
                     onBlur={field.handleBlur}
                     autoComplete="off"
                     aria-invalid={isInvalid}
-                    className="h-10 border-0 border-b border-[#e2e8f0] rounded-none px-0 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
+                    className="h-9 border-0 border-b border-[#e2e8f0] rounded-none px-0 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -179,7 +127,7 @@ export default function LoginForm() {
                       onBlur={field.handleBlur}
                       autoComplete="off"
                       aria-invalid={isInvalid}
-                      className="h-10 border-0 border-b border-[#e2e8f0] rounded-none px-0 pr-8 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
+                      className="h-9 border-0 border-b border-[#e2e8f0] rounded-none px-0 pr-8 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
                     />
                     <button
                       type="button"
@@ -221,36 +169,37 @@ export default function LoginForm() {
         <Button
           disabled={loginPending}
           type="submit"
-          className="mt-2 h-11 w-full rounded-lg bg-[#3b82f6] text-[15px] font-medium text-white hover:bg-[#2563eb] shadow-md shadow-blue-500/20"
+          className="mt-1 h-10 w-full rounded-lg bg-[#3b82f6] text-[15px] font-medium text-white hover:bg-[#2563eb] shadow-md shadow-blue-500/20"
         >
           {loginPending ? (
             <>
               <Spinner /> Signing
             </>
           ) : (
-            " Sign In"
+            "Sign In"
           )}
         </Button>
-
-        {/* Footer link */}
-        <p className="pt-1 text-center text-[13px]">
-          <Link
-            href="/signup"
-            className="font-medium text-[#ec4899] hover:underline"
-          >
-            Don&apos;t have an account?
-          </Link>
-        </p>
       </form>
 
-      <FieldSeparator>Or continue with</FieldSeparator>
-      <GoogleLogin
-        theme="outline"
-        shape="pill"
-        text="continue_with"
-        onSuccess={handleGoogleSuccess}
-        onError={handleGoogleError}
-      />
+      <FieldSeparator className="mt-2">Or continue with</FieldSeparator>
+      <div className="mt-4">
+        <GoogleLoginButton
+          successTitle="Logged In Successfully"
+          successDescription="Welcome Back!"
+          redirectTo="/"
+        />
+      </div>
+
+      {/* Footer link */}
+      <p className="mt-5 text-center text-[13px] text-[#64748b]">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/signup"
+          className="font-medium text-[#ec4899] hover:underline"
+        >
+          Sign Up
+        </Link>
+      </p>
     </div>
   );
 }

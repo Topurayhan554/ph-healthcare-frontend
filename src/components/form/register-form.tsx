@@ -8,25 +8,30 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
+  FieldSeparator,
 } from "@/components/ui/field";
 import { useState } from "react";
 import { Eye, EyeClosed } from "lucide-react";
 import Link from "next/link";
 import { signupSchema } from "@/validation";
+import GoogleLoginButton from "../modules/google-login/googleLoginButton";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const form = useForm({
     defaultValues: {
       fullName: "",
       email: "",
+      phoneNumber: "",
       password: "",
+      confirmPassword: "",
     },
     validators: {
       onSubmit: signupSchema,
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       console.log(value);
     },
   });
@@ -34,7 +39,7 @@ export default function RegisterForm() {
   return (
     <>
       {/* Tabs */}
-      <div className="mb-8 flex items-center gap-6">
+      <div className="mb-6 flex items-center gap-6">
         <Link
           href="/register"
           className="relative pb-2 text-[15px] font-semibold text-[#1e293b]"
@@ -55,9 +60,9 @@ export default function RegisterForm() {
           e.preventDefault();
           form.handleSubmit();
         }}
-        className="space-y-6"
+        className="space-y-4"
       >
-        <FieldGroup className="gap-6">
+        <FieldGroup className="gap-3">
           {/* Full Name */}
           <form.Field name="fullName">
             {(field) => {
@@ -81,7 +86,7 @@ export default function RegisterForm() {
                     onBlur={field.handleBlur}
                     autoComplete="off"
                     aria-invalid={isInvalid}
-                    className="h-10 border-0 border-b border-[#e2e8f0] rounded-none px-0 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
+                    className="h-9 border-0 border-b border-[#e2e8f0] rounded-none px-0 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -113,7 +118,39 @@ export default function RegisterForm() {
                     onBlur={field.handleBlur}
                     autoComplete="off"
                     aria-invalid={isInvalid}
-                    className="h-10 border-0 border-b border-[#e2e8f0] rounded-none px-0 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
+                    className="h-9 border-0 border-b border-[#e2e8f0] rounded-none px-0 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
+
+          {/* Phone Number */}
+          <form.Field name="phoneNumber">
+            {(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel
+                    htmlFor={field.name}
+                    className="text-[13px] font-medium text-[#334155]"
+                  >
+                    Phone Number
+                  </FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="tel"
+                    placeholder="+8801XXXXXXXXX"
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    autoComplete="off"
+                    aria-invalid={isInvalid}
+                    className="h-9 border-0 border-b border-[#e2e8f0] rounded-none px-0 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -146,7 +183,7 @@ export default function RegisterForm() {
                       onBlur={field.handleBlur}
                       autoComplete="off"
                       aria-invalid={isInvalid}
-                      className="h-10 border-0 border-b border-[#e2e8f0] rounded-none px-0 pr-8 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
+                      className="h-9 border-0 border-b border-[#e2e8f0] rounded-none px-0 pr-8 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
                     />
                     <button
                       type="button"
@@ -165,23 +202,78 @@ export default function RegisterForm() {
               );
             }}
           </form.Field>
+
+          {/* Confirm Password */}
+          <form.Field name="confirmPassword">
+            {(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel
+                    htmlFor={field.name}
+                    className="text-[13px] font-medium text-[#334155]"
+                  >
+                    Confirm Password
+                  </FieldLabel>
+                  <div className="relative">
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      onBlur={field.handleBlur}
+                      autoComplete="off"
+                      aria-invalid={isInvalid}
+                      className="h-9 border-0 border-b border-[#e2e8f0] rounded-none px-0 pr-8 shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-[#94a3b8]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((p) => !p)}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-[#64748b]"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeClosed className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
+                    </button>
+                  </div>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
         </FieldGroup>
 
         {/* Sign Up Button */}
         <Button
           type="submit"
-          className="mt-2 h-11 w-full rounded-lg bg-[#3b82f6] text-[15px] font-medium text-white hover:bg-[#2563eb] shadow-md shadow-blue-500/20"
+          className="mt-1 h-10 w-full rounded-lg bg-[#3b82f6] text-[15px] font-medium text-white hover:bg-[#2563eb] shadow-md shadow-blue-500/20"
         >
           Create Account
         </Button>
 
+        <FieldSeparator className="mt-2">Or continue with</FieldSeparator>
+        <div className="mt-4">
+          <GoogleLoginButton
+            successTitle="Signed Up Successfully"
+            successDescription="Welcome to MediSync!"
+            redirectTo="/"
+          />
+        </div>
+
         {/* Footer link */}
-        <p className="pt-1 text-center text-[13px]">
+        <p className="mt-5 text-center text-[13px] text-[#64748b]">
+          Already have an account?{" "}
           <Link
             href="/login"
             className="font-medium text-[#ec4899] hover:underline"
           >
-            I have an Account?
+            Sign In
           </Link>
         </p>
       </form>
