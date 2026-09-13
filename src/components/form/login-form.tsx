@@ -14,7 +14,7 @@ import { useState } from "react";
 import { Eye, EyeClosed } from "lucide-react";
 import Link from "next/link";
 import { loginSchema } from "@/validation";
-import { useLogin } from "@/hooks";
+import { useGoogleOAuth, useLogin } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { toast } from "../ui/toast";
 import { Spinner } from "../ui/spinner";
@@ -23,7 +23,7 @@ import { GoogleLogin } from "@react-oauth/google";
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const { mutate: login, isPending: loginPending } = useLogin();
-
+  const { mutate: googleLogin } = useGoogleOAuth();
   const router = useRouter();
 
   const form = useForm({
@@ -60,6 +60,57 @@ export default function LoginForm() {
       });
     },
   });
+
+  const handleGoogleSuccess = (credentialResponse: { credential?: string }) => {
+    const idToken = credentialResponse.credential;
+
+    if (!idToken) {
+      toast.add({
+        title: "Google OAuth Failed",
+        description: "Something went wrong. Please try again",
+        type: "error",
+      });
+      return;
+    }
+
+    googleLogin(
+      { idToken },
+      {
+        onSuccess: () => {
+          toast.add({
+            title: "Logged In Successfully",
+            description: "Welcome Back!",
+            type: "success",
+          });
+          router.push("/");
+        },
+        onError: (err) => {
+          toast.add({
+            title: "Google OAuth Failed",
+            description:
+              err.message || "Something went wrong. Please try again",
+            type: "error",
+          });
+        },
+      },
+    );
+
+    if (!credentialResponse.credential) {
+      toast.add({
+        title: "Google OAuth Failed",
+        description: "Something went wrong. Please try again",
+        type: "error",
+      });
+    }
+  };
+
+  const handleGoogleError = () => {
+    toast.add({
+      title: "Google OAuth Failed",
+      description: "Something went wrong. Please try again",
+      type: "error",
+    });
+  };
 
   return (
     <div>
@@ -192,8 +243,14 @@ export default function LoginForm() {
         </p>
       </form>
 
-      <FieldSeparator>Or</FieldSeparator>
-      <GoogleLogin onSuccess={() => {}} onError={() => {}} />
+      <FieldSeparator>Or continue with</FieldSeparator>
+      <GoogleLogin
+        theme="outline"
+        shape="pill"
+        text="continue_with"
+        onSuccess={handleGoogleSuccess}
+        onError={handleGoogleError}
+      />
     </div>
   );
 }
