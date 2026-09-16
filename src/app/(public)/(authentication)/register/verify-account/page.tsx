@@ -4,7 +4,7 @@ import { Suspense } from "react";
 export default function VerifyAccountPage() {
   return (
     <div>
-      <h1>This is verify component</h1>
+      <h1>Hello verify</h1>
       <Suspense>
         <VerifyAccountForm />
       </Suspense>

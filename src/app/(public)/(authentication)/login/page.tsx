@@ -35,7 +35,7 @@ export default function LoginPage() {
       /> */}
 
       <div className="relative z-10 flex min-h-screen items-center justify-center p-4 sm:p-6 lg:p-10">
-        <div className="flex w-full max-w-7xl overflow-hidden rounded-[28px] bg-white shadow-2xl">
+        <div className="flex w-full max-w-5xl overflow-hidden rounded-[28px] bg-white shadow-2xl">
           {/*  LEFT PANEL  */}
           <div className="relative hidden lg:flex lg:w-[55%] flex-col overflow-hidden bg-gradient-to-br from-[#4f8cff] via-[#3b7bf5] to-[#2f6ae8] lg:flex">
             {/* Curved right edge */}
