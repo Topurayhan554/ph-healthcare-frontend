@@ -35,9 +35,9 @@ export default function LoginPage() {
       /> */}
 
       <div className="relative z-10 flex min-h-screen items-center justify-center p-4 sm:p-6 lg:p-10">
-        <div className="flex w-full max-w-5xl overflow-hidden rounded-[28px] bg-white shadow-2xl">
+        <div className="flex w-full max-w-7xl overflow-hidden rounded-[28px] bg-white shadow-2xl">
           {/*  LEFT PANEL  */}
-          <div className="relative hidden w-1/2 flex-col overflow-hidden bg-gradient-to-br from-[#4f8cff] via-[#3b7bf5] to-[#2f6ae8] lg:flex">
+          <div className="relative hidden lg:flex lg:w-[55%] flex-col overflow-hidden bg-gradient-to-br from-[#4f8cff] via-[#3b7bf5] to-[#2f6ae8] lg:flex">
             {/* Curved right edge */}
             <div className="absolute right-0 top-0 z-20 h-full w-20">
               <svg
@@ -73,7 +73,7 @@ export default function LoginPage() {
 
               {/* Full doctor image, floating with its own shadow */}
               <div className="relative z-10 -translate-y-4">
-                <div className="relative h-[420px] w-[500px]">
+                <div className="relative h-[450px] w-[500px]">
                   <Image
                     src="/login-doctor10.png"
                     alt="Doctor"
@@ -94,7 +94,7 @@ export default function LoginPage() {
           </div>
 
           {/*  RIGHT PANEL  */}
-          <div className="flex w-full flex-col bg-[#f7f9fc] lg:w-1/2">
+          <div className="flex w-full flex-col bg-[#f7f9fc] lg:w-[45%]">
             <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 sm:px-12">
               {/* Form Card */}
               <div className="w-full max-w-[340px] rounded-2xl bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.06)]">

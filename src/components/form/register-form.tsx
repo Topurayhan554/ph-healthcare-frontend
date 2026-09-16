@@ -11,7 +11,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { useState } from "react";
-import { Eye, EyeClosed } from "lucide-react";
+import { Eye, EyeClosed, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { signupSchema } from "@/validation";
 import GoogleLoginButton from "../modules/google-login/googleLoginButton";
@@ -24,7 +24,7 @@ export default function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const router = useRouter();
-  const { mutate: registration } = useRegistration();
+  const { mutate: registration, isPending } = useRegistration();
 
   const form = useForm({
     defaultValues: {
@@ -292,12 +292,27 @@ export default function RegisterForm() {
         </FieldGroup>
 
         {/* Sign Up Button */}
-        <Button
-          type="submit"
-          className="mt-1 h-10 w-full rounded-lg bg-[#3b82f6] text-[15px] font-medium text-white hover:bg-[#2563eb] shadow-md shadow-blue-500/20"
-        >
-          Create Account
-        </Button>
+        <form.Subscribe selector={(state) => state.isSubmitting}>
+          {(isSubmitting) => {
+            const loading = isSubmitting || isPending;
+            return (
+              <Button
+                type="submit"
+                disabled={loading}
+                className="mt-1 h-10 w-full rounded-lg bg-[#3b82f6] text-[15px] font-medium text-white hover:bg-[#2563eb] shadow-md shadow-blue-500/20 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="size-4 animate-spin" />
+                    Creating Account...
+                  </span>
+                ) : (
+                  "Create Account"
+                )}
+              </Button>
+            );
+          }}
+        </form.Subscribe>
 
         <FieldSeparator className="mt-2">Or continue with</FieldSeparator>
         <div className="mt-4">
