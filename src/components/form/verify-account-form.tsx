@@ -19,10 +19,34 @@ import {
 import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 import { useEffect, useState } from "react";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { useVeifyAccount } from "@/hooks";
+import { useVeifyAccount, useResendOtp } from "@/hooks";
 import { toast } from "../ui/toast";
 
-const RESEND_COOLDOWN = 120;
+const RESEND_COOLDOWN = 120; // seconds
+const RESEND_STORAGE_PREFIX = "otp_resend_expiry";
+
+function getStorageKey(email: string) {
+  return `${RESEND_STORAGE_PREFIX}:${email}`;
+}
+
+function readExpiry(email: string): number | null {
+  try {
+    const raw = localStorage.getItem(getStorageKey(email));
+    return raw ? Number(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeExpiry(email: string, expiry: number) {
+  try {
+    localStorage.setItem(getStorageKey(email), String(expiry));
+  } catch {}
+}
+
+function getRemainingSeconds(expiry: number) {
+  return Math.max(0, Math.ceil((expiry - Date.now()) / 1000));
+}
 
 export default function VerifyAccountForm() {
   const searchParams = useSearchParams();
@@ -30,43 +54,64 @@ export default function VerifyAccountForm() {
 
   const [otp, setOtp] = useState("");
   const [isInValid, setIsInValid] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(
+    "Invalid code please try again",
+  );
   const { mutate: verify, isPending: verifyPending } = useVeifyAccount();
+  const { mutate: resendOtp, isPending: resendPending } = useResendOtp();
+
   const [resendTimer, setResendTimer] = useState(RESEND_COOLDOWN);
 
   const email = searchParams.get("email") || "";
-  console.log(email);
 
   useEffect(() => {
     if (!email) {
-      router.push("./");
+      router.push("/");
     }
   }, [email, router]);
 
   useEffect(() => {
-    if (resendTimer <= 0) {
-      return;
+    if (!email) return;
+
+    let expiry = readExpiry(email);
+
+    if (!expiry || getRemainingSeconds(expiry) <= 0) {
+      expiry = Date.now() + RESEND_COOLDOWN * 1000;
+      writeExpiry(email, expiry);
     }
 
-    const timer = setInterval(() => {
-      setResendTimer((prev) => prev - 1);
+    setResendTimer(getRemainingSeconds(expiry));
+  }, [email]);
+
+  useEffect(() => {
+    if (!email || resendTimer <= 0) return;
+
+    const interval = setInterval(() => {
+      const expiry = readExpiry(email) ?? Date.now();
+      const remaining = getRemainingSeconds(expiry);
+      setResendTimer(remaining);
+      if (remaining <= 0) {
+        clearInterval(interval);
+      }
     }, 1000);
-    return () => clearInterval(timer);
-  });
+
+    return () => clearInterval(interval);
+  }, [resendTimer, email]);
 
   const handleOTP = () => {
     if (otp.length !== 6) {
+      setErrorMessage("Please enter the full 6-digit code");
       setIsInValid(true);
       return;
     }
 
-    const verifyData = {
-      email,
-      otp,
-    };
+    const verifyData = { email, otp };
 
     verify(verifyData, {
       onSuccess: (res) => {
         if (!res.success) {
+          setErrorMessage("Invalid or expired OTP. Please try again.");
+          setIsInValid(true);
           toast.add({
             title: "Verification Failed",
             description: "Something went wrong. Please try again.",
@@ -84,6 +129,10 @@ export default function VerifyAccountForm() {
         router.push("/");
       },
       onError: (err) => {
+        setErrorMessage(
+          err.message || "Invalid or expired OTP. Please try again.",
+        );
+        setIsInValid(true);
         toast.add({
           title: "Verification Failed",
           description:
@@ -92,8 +141,33 @@ export default function VerifyAccountForm() {
         });
       },
     });
+  };
 
-    console.log("Click->", verifyData);
+  const handleResend = () => {
+    if (resendTimer > 0 || resendPending) return;
+
+    resendOtp(
+      { email },
+      {
+        onSuccess: () => {
+          const expiry = Date.now() + RESEND_COOLDOWN * 1000;
+          writeExpiry(email, expiry);
+          setResendTimer(RESEND_COOLDOWN);
+          toast.add({
+            title: "OTP Sent",
+            description: "A new code has been sent to your email.",
+            type: "success",
+          });
+        },
+        onError: (err) => {
+          toast.add({
+            title: "Failed to resend",
+            description: err.message || "Please try again later.",
+            type: "error",
+          });
+        },
+      },
+    );
   };
 
   if (!email) {
@@ -104,9 +178,8 @@ export default function VerifyAccountForm() {
     <Card>
       <CardHeader>
         <CardTitle>Verify Account</CardTitle>
-
         <CardDescription>
-          Please provide the OTP we sent to your email.
+          Please provide the OTP we sent to {email}.
         </CardDescription>
       </CardHeader>
 
@@ -150,22 +223,29 @@ export default function VerifyAccountForm() {
               </InputOTPGroup>
             </InputOTP>
 
-            <FieldDescription>Resend in {resendTimer}</FieldDescription>
+            <FieldDescription>
+              {resendTimer > 0
+                ? `Resend in ${resendTimer}s`
+                : "You can resend the code now"}
+            </FieldDescription>
           </Field>
 
-          {isInValid && (
-            <FieldError
-              errors={[{ message: "Invalid code please try again" }]}
-            />
-          )}
+          {isInValid && <FieldError errors={[{ message: errorMessage }]} />}
         </form>
       </CardContent>
 
       <CardFooter>
-        <Button disabled={resendTimer > 0}>Resend</Button>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={resendTimer > 0 || resendPending}
+          onClick={handleResend}
+        >
+          {resendPending ? "Sending..." : "Resend"}
+        </Button>
 
-        <Button type="submit" form="otp-form">
-          Submit
+        <Button type="submit" form="otp-form" disabled={verifyPending}>
+          {verifyPending ? "Verifying..." : "Submit"}
         </Button>
       </CardFooter>
     </Card>
