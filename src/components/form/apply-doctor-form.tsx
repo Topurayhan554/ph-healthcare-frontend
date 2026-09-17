@@ -17,7 +17,6 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -46,7 +45,6 @@ const iconClass =
 const inputClass =
   "h-9 border-0 border-b border-white/25 rounded-none pl-6 pr-0 shadow-none bg-transparent text-white shadow-none focus-visible:ring-0 focus-visible:border-[#3b82f6] placeholder:text-white/40";
 const descriptionClass = "text-white/50";
-const mutedTextClass = "text-white/50";
 const chipClass =
   "inline-flex max-w-full items-center gap-2 rounded-lg bg-white/10 border border-white/15 px-2.5 py-1 text-sm text-white";
 const chipIconClass = "size-4 shrink-0 text-[#3b82f6]";
@@ -60,29 +58,33 @@ function toFieldErrors(errors: unknown[]) {
 }
 
 export default function DoctorApplyForm() {
-  const router = useRouter();
   const { mutate: apply, isPending: applyPending } = useApplyAsDoctor();
-
-  const userSchema = applyAsDoctorSchema.shape.user;
-  const doctorSchema = applyAsDoctorSchema.shape.doctor;
 
   const form = useForm({
     defaultValues: {
-      name: "Topu Rayhan",
-      email: "topurayhan@gmail.com",
-      phone: "01912345678",
-      address: "Neptune",
-      specialization: "Cardiologist",
-      licenseNumber: "ABC123",
-      qualifications: "MBBS",
-      experienceYears: "50",
-      consultationFee: "10000",
-      bio: "My life, my rules.",
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      specialization: "",
+      licenseNumber: "",
+      qualifications: "",
+      experienceYears: "",
+      consultationFee: "",
+      bio: "",
       resume: null as File | null,
       additionalFiles: [] as File[],
     },
 
+    validators: {
+      onSubmit: applyAsDoctorSchema,
+    },
+
     onSubmit: async ({ value }) => {
+      const trimmedAddress = value.address.trim();
+      const trimmedBio = value.bio.trim();
+      const trimmedPhone = value.phone.trim();
+
       const doctorData: DoctorApplicationData = {
         user: {
           name: value.name.trim(),
@@ -93,12 +95,12 @@ export default function DoctorApplyForm() {
           licenseNumber: value.licenseNumber.trim(),
           qualifications: value.qualifications.trim(),
           experienceYears: Number(value.experienceYears),
-          contactNumber: value.phone.trim(),
-          address: value.address.trim(),
+          contactNumber: trimmedPhone,
+          address: trimmedAddress,
           consultationFee: value.consultationFee.trim()
             ? Number(value.consultationFee)
             : undefined,
-          bio: value.bio.trim(),
+          bio: trimmedBio,
         },
       };
 
@@ -139,7 +141,8 @@ export default function DoctorApplyForm() {
               name="name"
               validators={{
                 onChange: ({ value }) => {
-                  const result = userSchema.shape.name.safeParse(value);
+                  const result =
+                    applyAsDoctorSchema.shape.name.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0]?.message;
@@ -183,7 +186,8 @@ export default function DoctorApplyForm() {
               name="email"
               validators={{
                 onChange: ({ value }) => {
-                  const result = userSchema.shape.email.safeParse(value);
+                  const result =
+                    applyAsDoctorSchema.shape.email.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0]?.message;
@@ -228,7 +232,7 @@ export default function DoctorApplyForm() {
               validators={{
                 onChange: ({ value }) => {
                   const result =
-                    doctorSchema.shape.contactNumber.safeParse(value);
+                    applyAsDoctorSchema.shape.phone.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0]?.message;
@@ -272,7 +276,8 @@ export default function DoctorApplyForm() {
               name="address"
               validators={{
                 onChange: ({ value }) => {
-                  const result = doctorSchema.shape.address.safeParse(value);
+                  const result =
+                    applyAsDoctorSchema.shape.address.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0]?.message;
@@ -320,7 +325,7 @@ export default function DoctorApplyForm() {
               validators={{
                 onChange: ({ value }) => {
                   const result =
-                    doctorSchema.shape.specialization.safeParse(value);
+                    applyAsDoctorSchema.shape.specialization.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0]?.message;
@@ -364,7 +369,7 @@ export default function DoctorApplyForm() {
               validators={{
                 onChange: ({ value }) => {
                   const result =
-                    doctorSchema.shape.licenseNumber.safeParse(value);
+                    applyAsDoctorSchema.shape.licenseNumber.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0]?.message;
@@ -408,7 +413,7 @@ export default function DoctorApplyForm() {
               validators={{
                 onChange: ({ value }) => {
                   const result =
-                    doctorSchema.shape.qualifications.safeParse(value);
+                    applyAsDoctorSchema.shape.qualifications.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0]?.message;
@@ -452,7 +457,7 @@ export default function DoctorApplyForm() {
               validators={{
                 onChange: ({ value }) => {
                   const result =
-                    doctorSchema.shape.experienceYears.safeParse(value);
+                    applyAsDoctorSchema.shape.experienceYears.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0]?.message;
@@ -502,7 +507,7 @@ export default function DoctorApplyForm() {
                 onChange: ({ value }) => {
                   if (!value.trim()) return undefined;
                   const result =
-                    doctorSchema.shape.consultationFee.safeParse(value);
+                    applyAsDoctorSchema.shape.consultationFee.safeParse(value);
                   return result.success
                     ? undefined
                     : result.error.issues[0]?.message;

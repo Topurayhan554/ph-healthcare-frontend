@@ -1,48 +1,9 @@
 import { z } from "zod";
 
-export const applyAsDoctorSchema = z.object({
-  user: z.object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
-
-    email: z.email("Not email!!"),
-  }),
-
-  doctor: z.object({
-    address: z.string().optional(),
-
-    specialization: z.string().min(2, "Specialization is required"),
-
-    licenseNumber: z.string().min(1, "License number is required"),
-
-    qualifications: z.string().min(1, "Qualifications are required"),
-
-    experienceYears: z.coerce
-      .number({ error: "Enter a valid number" })
-      .min(0, "Experience can't be negative")
-      .max(70, "Enter a valid number of years"),
-
-    bio: z.string().optional(),
-
-    consultationFee: z.coerce
-      .number({ error: "Enter a valid number" })
-      .min(0, "Fee can't be negative")
-      .optional(),
-
-    contactNumber: z
-      .string()
-      .regex(/^[0-9+\-\s()]{7,20}$/, "Enter a valid contact number")
-      .optional()
-      .or(z.literal("")),
-  }),
-});
-
-export type ApplyAsDoctorFormValues = z.infer<typeof applyAsDoctorSchema>;
-
 export const MAX_FILE_SIZE = 5;
-
 export const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE * 1024 * 1024;
-
 export const MAX_ADDITIONAL_FILES = 5;
+export const MAX_BIO_LENGTH = 1000;
 
 export const ACCEPTED_FILE_TYPES = [
   "application/pdf",
@@ -59,3 +20,70 @@ export function isAcceptedFileSize(fileSize: number) {
 export function isAcceptedFileType(fileType: string) {
   return ACCEPTED_FILE_TYPES.includes(fileType);
 }
+
+export const getCustomFileSchema = <T>(message: string) =>
+  z.custom<T>(
+    (value) =>
+      value === null ||
+      (value instanceof File &&
+        isAcceptedFileSize(value.size) &&
+        isAcceptedFileType(value.type)),
+    { message },
+  );
+
+export const applyAsDoctorSchema = z.object({
+  name: z.string().trim().min(2, "Name must be at least 2 characters"),
+  email: z.email("Please enter a valid email address"),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^[0-9+\-\s()]{7,20}$/, "Enter a valid contact number")
+    .or(z.literal("")),
+  address: z.string().trim(),
+  specialization: z.string().trim().min(2, "Specialization is required"),
+  licenseNumber: z.string().trim().min(1, "License number is required"),
+  qualifications: z.string().trim().min(1, "Qualifications are required"),
+  experienceYears: z
+    .string()
+    .trim()
+    .refine((value) => /^\d+$/.test(value), {
+      message: "Years of experience must be a whole number",
+    })
+    .refine((value) => Number(value) >= 0 && Number(value) <= 70, {
+      message: "Years of experience must be between 0 and 70",
+    }),
+  consultationFee: z
+    .string()
+    .trim()
+    .refine(
+      (value) => value === "" || (/^\d+$/.test(value) && Number(value) >= 0),
+      { message: "Consultation fee must be a non-negative whole number" },
+    ),
+  bio: z
+    .string()
+    .trim()
+    .max(MAX_BIO_LENGTH, `Bio cannot exceed ${MAX_BIO_LENGTH} characters`),
+  resume: getCustomFileSchema<File | null>(
+    `Resume must be a PDF, DOC, DOCX or an image file under ${MAX_FILE_SIZE}MB`,
+  ).refine((value) => value instanceof File, {
+    message: "A resume or CV is required",
+  }),
+  additionalFiles: z
+    .array(z.custom<File>((value) => value instanceof File))
+    .max(
+      MAX_ADDITIONAL_FILES,
+      `You can attach at most ${MAX_ADDITIONAL_FILES} supporting documents`,
+    )
+    .refine(
+      (files) =>
+        files.every(
+          (file) =>
+            isAcceptedFileSize(file.size) && isAcceptedFileType(file.type),
+        ),
+      {
+        message: `Each file must be a PDF, DOC, DOCX or an image file under ${MAX_FILE_SIZE}MB`,
+      },
+    ),
+});
+
+export type ApplyAsDoctorFormValues = z.infer<typeof applyAsDoctorSchema>;
