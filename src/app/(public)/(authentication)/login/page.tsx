@@ -1,4 +1,5 @@
 import LoginForm from "@/components/form/login-form";
+import Logo from "@/components/shared/Logo";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -52,15 +53,7 @@ export default function LoginPage() {
             {/* Logo */}
 
             <div className="relative z-10 flex items-center gap-2.5 p-8 pb-4">
-              <div className="relative h-15 w-15 ">
-                <Image
-                  src="/medisync-logo.png"
-                  alt="MediSync"
-                  fill
-                  className="object-contain object-left"
-                  priority
-                />
-              </div>
+              <Logo />
             </div>
 
             {/* Doctor Image */}
