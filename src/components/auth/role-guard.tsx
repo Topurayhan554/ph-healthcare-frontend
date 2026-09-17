@@ -40,5 +40,5 @@ export default function RoleGuard({ children, roles }: IProps) {
     return <>{children}</>;
   }
 
-  return <AccessDenied>{}</AccessDenied>;
+  return <AccessDenied />;
 }

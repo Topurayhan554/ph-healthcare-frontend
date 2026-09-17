@@ -6,11 +6,18 @@ import {
 } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "./dashboad-sidebar";
 import { ReactNode } from "react";
+import { UserRole } from "@/types";
 
-export default function DashboardShel({ children }: { children: ReactNode }) {
+export default function DashboardShel({
+  children,
+  userRole,
+}: {
+  children: ReactNode;
+  userRole: UserRole;
+}) {
   return (
     <SidebarProvider>
-      <DashboardSidebar />
+      <DashboardSidebar role={userRole} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
