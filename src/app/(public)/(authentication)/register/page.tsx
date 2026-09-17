@@ -27,7 +27,7 @@ export default function RegisterPage() {
           <div className="relative hidden lg:flex lg:w-[55%] flex-col overflow-hidden">
             {/* Image fills the entire panel */}
             <Image
-              src="/doctors1.jpg"
+              src="/doctors2.jpg"
               alt=""
               fill
               className="object-cover"
