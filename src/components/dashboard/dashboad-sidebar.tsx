@@ -48,13 +48,13 @@ export function DashboardSidebar({ role }: { role: UserRole }) {
 
             <SidebarGroupContent>
               <SidebarMenu>
-                {item.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
+                {item.items.map((subItem) => (
+                  <SidebarMenuItem key={subItem.title}>
                     <SidebarMenuButton
-                      render={<Link href={item.url} />}
-                      isActive={pathname === item.url}
+                      render={<Link href={subItem.url} />}
+                      isActive={pathname === subItem.url}
                     >
-                      {item.title}
+                      {subItem.title}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
