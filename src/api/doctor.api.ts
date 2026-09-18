@@ -3,6 +3,7 @@ import {
   ApiResponse,
   Doctor,
   DoctorApplicationPayload,
+  DoctorParams,
   VerifyAccountPayload,
 } from "@/types";
 
@@ -29,6 +30,8 @@ export function verifyDoctorAccount(payload: VerifyAccountPayload) {
   });
 }
 
-export function getAllDoctors() {
-  return apiClient<ApiResponse< Doctor[]>>("/doctor/all-doctors");
+export function getAllDoctors(params: DoctorParams) {
+  return apiClient<ApiResponse<Doctor[]>>("/doctor/all-doctors", {
+    params,
+  });
 }

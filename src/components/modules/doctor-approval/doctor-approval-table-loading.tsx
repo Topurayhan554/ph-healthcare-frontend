@@ -25,7 +25,7 @@ export default function DoctorApprovalTableLoading() {
         </TableHeader>
         <TableBody>
           {[1, 2, 3].map((doctor) => (
-            <TableRow>
+            <TableRow key={doctor}>
               <TableCell colSpan={6}>
                 <Skeleton className="h-5 w-20" />
               </TableCell>

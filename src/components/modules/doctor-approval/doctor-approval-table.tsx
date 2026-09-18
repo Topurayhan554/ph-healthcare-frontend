@@ -7,10 +7,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useSuspenseGetAllDoctors } from "@/hooks";
+import { DoctorVerificationStatus } from "@/types";
 import DoctorReviewSheet from "./doctor-review-sheet";
 
-export default function DoctorApprovalTable() {
-  const { data } = useSuspenseGetAllDoctors();
+interface Props {
+  verificationStatus?: DoctorVerificationStatus;
+}
+
+export default function DoctorApprovalTable({ verificationStatus }: Props) {
+  const { data } = useSuspenseGetAllDoctors({ verificationStatus });
 
   const doctors = data?.data;
   console.log(doctors);
