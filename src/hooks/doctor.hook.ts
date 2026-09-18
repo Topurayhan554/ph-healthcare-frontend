@@ -16,13 +16,13 @@ export function useVerifyDoctorAccount() {
 
 export function useGetAllDoctors(params: DoctorParams) {
   return useQuery({
-    queryKey: ["doctors"],
+    queryKey: ["doctors", params],
     queryFn: () => getAllDoctors(params),
   });
 }
 export function useSuspenseGetAllDoctors(params: DoctorParams) {
   return useSuspenseQuery({
-    queryKey: ["doctors"],
+    queryKey: ["doctors", params],
     queryFn: () => getAllDoctors(params),
   });
 }

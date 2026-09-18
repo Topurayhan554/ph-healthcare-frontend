@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DoctorApprovalTable from "./doctor-approval-table";
 import { Suspense, useState } from "react";
 import DoctorApprovalTableLoading from "./doctor-approval-table-loading";
-import { DoctorVerificationStatus } from "@/types";
+import { DoctorParams, DoctorVerificationStatus } from "@/types";
 import { Input } from "@/components/ui/input";
 
 const verificationStatus: ["ALL" | DoctorVerificationStatus, string][] = [
@@ -14,8 +14,12 @@ const verificationStatus: ["ALL" | DoctorVerificationStatus, string][] = [
 ];
 
 export default function DoctorApprovalTabs() {
-  const [tab, setTab] = useState("ALL");
-  
+  const [tab, setTab] = useState<"ALL" | DoctorVerificationStatus>("ALL");
+  const queryParams: DoctorParams = {
+    page: 1,
+    limit: 10,
+    ...(tab === "ALL" ? {} : { verificationStatus: tab }),
+  };
   return (
     <>
       <div className="flex justify-between items-center p-6">
@@ -33,7 +37,7 @@ export default function DoctorApprovalTabs() {
         </Tabs>
       </div>
       <Suspense fallback={<DoctorApprovalTableLoading />}>
-        <DoctorApprovalTable verificationStauts={tab} />
+        <DoctorApprovalTable {...queryParams} />
       </Suspense>
     </>
   );
