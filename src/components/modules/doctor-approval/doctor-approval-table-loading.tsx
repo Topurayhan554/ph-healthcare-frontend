@@ -6,15 +6,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useSuspenseGetAllDoctors } from "@/hooks";
 import DoctorReviewSheet from "./doctor-review-sheet";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export default function DoctorApprovalTable() {
-  const { data } = useSuspenseGetAllDoctors();
-
-  const doctors = data?.data;
-  console.log(doctors);
-
+export default function DoctorApprovalTableLoading() {
   return (
     <div className="border rounded-lg">
       <Table>
@@ -29,18 +24,10 @@ export default function DoctorApprovalTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {doctors.map((doctor) => (
-            <TableRow key={doctor.id}>
-              <TableCell>{doctor.name}</TableCell>
-              <TableCell>{doctor.licenseNumber}</TableCell>
-              <TableCell>{doctor.email}</TableCell>
-              <TableCell>
-                {doctor.contactNumber ? doctor.contactNumber : "-"}
-              </TableCell>
-              <TableCell>{doctor.specialization}</TableCell>
-
-              <TableCell className="text-right">
-                <DoctorReviewSheet />
+          {[1, 2, 3].map((doctor) => (
+            <TableRow>
+              <TableCell colSpan={6}>
+                <Skeleton className="h-5 w-20" />
               </TableCell>
             </TableRow>
           ))}
