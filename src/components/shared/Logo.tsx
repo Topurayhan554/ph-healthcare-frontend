@@ -11,6 +11,7 @@ export default function Logo() {
           fill
           className="object-contain object-left"
           priority
+          sizes="100"
         />
       </div>
     </Link>

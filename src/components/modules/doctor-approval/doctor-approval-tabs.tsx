@@ -4,7 +4,7 @@ import DoctorApprovalTable from "./doctor-approval-table";
 
 export default function DoctorApprovalTabs() {
   return (
-    <Tabs defaultValue="account" className="w-[400px]">
+    <Tabs defaultValue="account">
       <TabsList>
         <TabsTrigger value="pending">Pending</TabsTrigger>
         <TabsTrigger value="approved">Approved</TabsTrigger>
