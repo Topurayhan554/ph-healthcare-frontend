@@ -9,10 +9,17 @@ import {
 import { useSuspenseGetAllDoctors } from "@/hooks";
 import { DoctorParams, DoctorVerificationStatus } from "@/types";
 import DoctorReviewSheet from "./doctor-review-sheet";
+import { Button } from "@/components/ui/button";
+import { Dispatch, SetStateAction } from "react";
 
-interface Props extends DoctorParams {}
+interface Props extends DoctorParams {
+  handleReview: Dispatch<SetStateAction<string>>;
+}
 
-export default function DoctorApprovalTable({ ...params }: Props) {
+export default function DoctorApprovalTable({
+  handleReview,
+  ...params
+}: Props) {
   const { data } = useSuspenseGetAllDoctors(params);
 
   const doctors = data?.data;
@@ -43,7 +50,12 @@ export default function DoctorApprovalTable({ ...params }: Props) {
               <TableCell>{doctor.specialization}</TableCell>
 
               <TableCell className="text-right">
-                <DoctorReviewSheet />
+                <Button
+                  variant={"outline"}
+                  onClick={() => handleReview(doctor.id)}
+                >
+                  Review
+                </Button>
               </TableCell>
             </TableRow>
           ))}
