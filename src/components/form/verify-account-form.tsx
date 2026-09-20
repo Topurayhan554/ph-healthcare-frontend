@@ -19,7 +19,12 @@ import {
 import { Field, FieldDescription, FieldError, FieldLabel } from "../ui/field";
 import { useEffect, useState } from "react";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { useVeifyAccount, useResendOtp, useVerifyDoctorAccount } from "@/hooks";
+import {
+  useVeifyAccount,
+  useResendOtp,
+  useVerifyDoctorAccount,
+  useResendDoctorOtp,
+} from "@/hooks";
 import { toast } from "../ui/toast";
 
 const RESEND_COOLDOWN = 120; // seconds
@@ -61,11 +66,22 @@ export default function VerifyAccountForm({
   const [errorMessage, setErrorMessage] = useState(
     "Invalid code please try again",
   );
-  const { mutate: verifyPatient, isPending: verifyPending } = useVeifyAccount();
-  const { mutate: resendOtp, isPending: resendPending } = useResendOtp();
-  const { mutate: verifyDoctor } = useVerifyDoctorAccount();
+
+  const { mutate: verifyPatient, isPending: verifyPatientPending } =
+    useVeifyAccount();
+  const { mutate: resendPatientOtp, isPending: resendPatientPending } =
+    useResendOtp();
+  const { mutate: verifyDoctor, isPending: verifyDoctorPending } =
+    useVerifyDoctorAccount();
+  const { mutate: resendDoctorOtp, isPending: resendDoctorPending } =
+    useResendDoctorOtp();
 
   const verify = mode === "doctor" ? verifyDoctor : verifyPatient;
+  const resendOtp = mode === "doctor" ? resendDoctorOtp : resendPatientOtp;
+  const verifyPending =
+    mode === "doctor" ? verifyDoctorPending : verifyPatientPending;
+  const resendPending =
+    mode === "doctor" ? resendDoctorPending : resendPatientPending;
 
   const [resendTimer, setResendTimer] = useState(RESEND_COOLDOWN);
 

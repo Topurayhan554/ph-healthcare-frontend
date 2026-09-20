@@ -37,7 +37,8 @@ import {
 import { DoctorApplicationData } from "@/types";
 import { useApplyAsDoctor } from "@/hooks";
 import { formatFileSize } from "@/utils";
-
+import { useRouter } from "next/navigation";
+import { toast } from "../ui/toast";
 const labelClass = "text-[13px] font-medium text-white/90";
 const subLabelClass = "font-normal text-white/50";
 const iconClass =
@@ -59,6 +60,7 @@ function toFieldErrors(errors: unknown[]) {
 
 export default function DoctorApplyForm() {
   const { mutate: apply, isPending: applyPending } = useApplyAsDoctor();
+  const router = useRouter();
 
   const form = useForm({
     defaultValues: {
@@ -112,7 +114,32 @@ export default function DoctorApplyForm() {
         },
         {
           onSuccess: (res) => {
-            console.log(res);
+            if (!res.success) {
+              toast.add({
+                title: "Application Failed",
+                description: "Something went wrong. Please try again",
+                type: "error",
+              });
+              return;
+            }
+
+            toast.add({
+              title: "Application Submitted",
+              description: "Please verify your email to continue",
+              type: "success",
+            });
+
+            const params = new URLSearchParams({
+              email: doctorData.user.email,
+            });
+            router.push(`/apply/verify-doctor-account?${params.toString()}`);
+          },
+          onError: (err) => {
+            toast.add({
+              title: "Submission Failed",
+              description: err.message || "",
+              type: "error",
+            });
           },
         },
       );

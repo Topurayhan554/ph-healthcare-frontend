@@ -31,6 +31,17 @@ export function verifyDoctorAccount(payload: VerifyAccountPayload) {
   });
 }
 
+export function resendDoctorOtp(
+  payload: VerifyAccountPayload extends { email: string }
+    ? Pick<VerifyAccountPayload, "email">
+    : { email: string },
+) {
+  return apiClient("/doctor/apply-as-doctor/resend-otp", {
+    method: "POST",
+    body: payload,
+  });
+}
+
 export function getAllDoctors(params: DoctorParams) {
   return apiClient<ApiResponse<Doctor[]>>("/doctor/all-doctors", {
     params,
