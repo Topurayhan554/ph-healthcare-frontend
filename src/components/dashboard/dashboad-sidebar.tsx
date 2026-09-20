@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Sidebar,
   SidebarContent,
@@ -25,10 +26,18 @@ const sidebarRoutes: Partial<Record<UserRole, SidebarItems>> = {
   PATIENT: patientRoutes,
 };
 
-export function DashboardSidebar({ role }: { role: UserRole }) {
+interface DashboardSidebarProps {
+  role: UserRole;
+}
+
+export function DashboardSidebar({ role }: DashboardSidebarProps) {
   const pathname = usePathname();
 
-  const routes: SidebarItems = sidebarRoutes[role] || [];
+  const routes: SidebarItems = sidebarRoutes[role] ?? [];
+
+  if (routes.length === 0 && process.env.NODE_ENV === "development") {
+    console.warn(`No sidebar routes configured for role: "${role}"`);
+  }
 
   return (
     <Sidebar>
@@ -40,8 +49,8 @@ export function DashboardSidebar({ role }: { role: UserRole }) {
           </span>
         </div>
       </SidebarHeader>
+
       <SidebarContent>
-        {/* We create a SidebarGroup for each parent. */}
         {routes.map((item) => (
           <SidebarGroup key={item.title}>
             <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
@@ -63,6 +72,7 @@ export function DashboardSidebar({ role }: { role: UserRole }) {
           </SidebarGroup>
         ))}
       </SidebarContent>
+
       <SidebarRail />
     </Sidebar>
   );
