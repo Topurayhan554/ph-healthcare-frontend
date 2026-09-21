@@ -18,3 +18,9 @@ export function getMySchedules(params: ScheduleParams) {
     params,
   });
 }
+
+export function publishSchedule(id: string) {
+  return apiClient<ApiResponse<Schedule>>(`/schedule/publish-schedule/${id}`, {
+    method: "PATCH",
+  });
+}

@@ -1,8 +1,8 @@
 "use client";
 
-import { ScheduleParams, ScheduleStatus } from "@/types/schedule.type";
 import { Suspense, useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScheduleParams, ScheduleStatus } from "@/types";
 import ScheduleCreateDialog from "./schedule-create-dialog";
 import ScheduleListLoading from "./schedule-list-loading";
 import ScheduleTable from "./schedule-table";
@@ -26,8 +26,11 @@ export default function ScheduleList() {
 
   return (
     <>
-      <div className="my-5 flex justify-between gap-3">
-        <Tabs value={tab} onValueChange={(value) => setTab(value)}>
+      <div className="my-5 flex flex-wrap items-center justify-between gap-3">
+        <Tabs
+          value={tab}
+          onValueChange={(value) => setTab(value as "ALL" | ScheduleStatus)}
+        >
           <TabsList>
             {statuses.map(([value, label]) => (
               <TabsTrigger key={value} value={value}>

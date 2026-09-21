@@ -6,23 +6,22 @@ export interface Schedule {
   endDateTime: string;
   totalSlots: number;
   availableSlots: number;
-  meetingLink: string;
   status: ScheduleStatus;
-  doctorId: string;
+  meetingLink: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ScheduleParams {
+  page?: number;
+  limit?: number;
+  sortBy?: "startDateTime" | "endDateTime" | "createdAt";
+  sortOrder?: "asc" | "desc";
+  status?: ScheduleStatus;
 }
 
 export interface CreateSchedulePayload {
   startDateTime: string;
   endDateTime: string;
-  meetingLink: string;
-}
-
-export interface ScheduleParams {
-  status?: ScheduleStatus;
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: "desc" | "asc";
+  totalSlots: number;
 }

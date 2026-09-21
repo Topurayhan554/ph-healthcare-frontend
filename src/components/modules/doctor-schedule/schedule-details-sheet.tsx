@@ -4,25 +4,30 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-
-import { Schedule } from "@/types/schedule.type";
+import { Button } from "@/components/ui/button";
+import { Schedule } from "@/types";
 
 interface Props {
   schedule: Schedule;
   open: boolean;
   onClose: () => void;
+  onPublish?: (id: string) => void;
+  isPublishing?: boolean;
 }
 
 export default function ScheduleDetailSheet({
   schedule,
   open,
   onClose,
+  onPublish,
+  isPublishing,
 }: Props) {
   return (
-    <Sheet open={open} onOpenChange={onClose}>
+    <Sheet open={open} onOpenChange={(next) => !next && onClose()}>
       <SheetContent side="right">
         <SheetHeader>
           <SheetTitle>Schedule details</SheetTitle>
@@ -32,7 +37,7 @@ export default function ScheduleDetailSheet({
             })}
           </SheetDescription>
         </SheetHeader>
-        <dl className="mt-4 flex flex-col gap-3 text-sm">
+        <dl className="mt-4 flex flex-col gap-3 px-4 text-sm">
           <div className="flex justify-between">
             <dt className="text-muted-foreground">Start</dt>
             <dd>
@@ -74,6 +79,18 @@ export default function ScheduleDetailSheet({
             </dd>
           </div>
         </dl>
+
+        {schedule.status === "DRAFT" && onPublish && (
+          <SheetFooter>
+            <Button
+              className="w-full"
+              onClick={() => onPublish(schedule.id)}
+              disabled={isPublishing}
+            >
+              {isPublishing ? "Publishing..." : "Publish Schedule"}
+            </Button>
+          </SheetFooter>
+        )}
       </SheetContent>
     </Sheet>
   );
