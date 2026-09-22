@@ -24,3 +24,9 @@ export function publishSchedule(id: string) {
     method: "PATCH",
   });
 }
+
+export function deleteSchedule(id: string) {
+  return apiClient<ApiResponse<null>>(`/schedule/${id}`, {
+    method: "DELETE",
+  });
+}

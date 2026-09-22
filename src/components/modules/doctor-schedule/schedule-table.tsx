@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CalendarPlus } from "lucide-react";
+import { CalendarPlus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import {
   useSuspenseMySchedules,
   usePublishSchedule,
+  useDeleteSchedule,
 } from "@/hooks/schedule.hook";
 import { Schedule, ScheduleParams } from "@/types";
 import ScheduleCreateDialog from "./schedule-create-dialog";
@@ -40,6 +41,10 @@ function formatDateTime(value: string) {
   });
 }
 
+function isExpired(endDateTime: string) {
+  return new Date(endDateTime).getTime() < Date.now();
+}
+
 export default function ScheduleTable(params: Props) {
   const { data } = useSuspenseMySchedules(params);
   const schedules: Schedule[] = data?.data ?? [];
@@ -50,12 +55,21 @@ export default function ScheduleTable(params: Props) {
   const [scheduleToPublish, setScheduleToPublish] = useState<Schedule | null>(
     null,
   );
+  const [scheduleToDelete, setScheduleToDelete] = useState<Schedule | null>(
+    null,
+  );
 
   const {
     mutate: publish,
     isPending: isPublishing,
-    variables,
+    variables: publishVariables,
   } = usePublishSchedule();
+
+  const {
+    mutate: remove,
+    isPending: isDeleting,
+    variables: deleteVariables,
+  } = useDeleteSchedule();
 
   function handlePublish(id: string) {
     publish(id, {
@@ -69,6 +83,21 @@ export default function ScheduleTable(params: Props) {
       onError: (error) => {
         toast.error(
           error instanceof Error ? error.message : "Failed to publish",
+        );
+      },
+    });
+  }
+
+  function handleDelete(id: string) {
+    remove(id, {
+      onSuccess: () => {
+        toast.success("Schedule deleted");
+        setSelectedSchedule((prev) => (prev && prev.id === id ? null : prev));
+        setScheduleToDelete(null);
+      },
+      onError: (error) => {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to delete",
         );
       },
     });
@@ -111,56 +140,76 @@ export default function ScheduleTable(params: Props) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {schedules.map((schedule) => (
-              <TableRow key={schedule.id}>
-                <TableCell>
-                  <div className="font-medium">
-                    {formatDateTime(schedule.startDateTime)}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    to {formatDateTime(schedule.endDateTime)}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {schedule.totalSlots - schedule.availableSlots}/
-                  {schedule.totalSlots} booked
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant={
-                      schedule.status === "PUBLISHED" ? "default" : "outline"
-                    }
-                    className={
-                      schedule.status === "PUBLISHED"
-                        ? "bg-green-600 hover:bg-green-600"
-                        : "text-amber-600 border-amber-600"
-                    }
-                  >
-                    {schedule.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right space-x-2">
-                  {schedule.status === "DRAFT" && (
+            {schedules.map((schedule) => {
+              const expired = isExpired(schedule.endDateTime);
+
+              return (
+                <TableRow key={schedule.id}>
+                  <TableCell>
+                    <div className="font-medium">
+                      {formatDateTime(schedule.startDateTime)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      to {formatDateTime(schedule.endDateTime)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {schedule.totalSlots - schedule.availableSlots}/
+                    {schedule.totalSlots} booked
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <Badge
+                        variant={
+                          schedule.status === "PUBLISHED"
+                            ? "default"
+                            : "outline"
+                        }
+                        className={
+                          schedule.status === "PUBLISHED"
+                            ? "bg-green-600 hover:bg-green-600"
+                            : "text-amber-600 border-amber-600"
+                        }
+                      >
+                        {schedule.status}
+                      </Badge>
+                      {expired && <Badge variant="secondary">Expired</Badge>}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right space-x-2">
+                    {schedule.status === "DRAFT" && !expired && (
+                      <Button
+                        size="sm"
+                        onClick={() => setScheduleToPublish(schedule)}
+                        disabled={
+                          isPublishing && publishVariables === schedule.id
+                        }
+                      >
+                        {isPublishing && publishVariables === schedule.id
+                          ? "Publishing..."
+                          : "Publish"}
+                      </Button>
+                    )}
                     <Button
+                      variant="outline"
                       size="sm"
-                      onClick={() => setScheduleToPublish(schedule)}
-                      disabled={isPublishing && variables === schedule.id}
+                      onClick={() => setSelectedSchedule(schedule)}
                     >
-                      {isPublishing && variables === schedule.id
-                        ? "Publishing..."
-                        : "Publish"}
+                      View
                     </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSelectedSchedule(schedule)}
-                  >
-                    View
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => setScheduleToDelete(schedule)}
+                      disabled={isDeleting && deleteVariables === schedule.id}
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
@@ -171,7 +220,11 @@ export default function ScheduleTable(params: Props) {
           open={!!selectedSchedule}
           onClose={() => setSelectedSchedule(null)}
           onPublish={() => setScheduleToPublish(selectedSchedule)}
-          isPublishing={isPublishing && variables === selectedSchedule.id}
+          onDelete={() => setScheduleToDelete(selectedSchedule)}
+          isPublishing={
+            isPublishing && publishVariables === selectedSchedule.id
+          }
+          isDeleting={isDeleting && deleteVariables === selectedSchedule.id}
         />
       )}
 
@@ -207,6 +260,41 @@ export default function ScheduleTable(params: Props) {
               }}
             >
               {isPublishing ? "Publishing..." : "Yes, publish"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!scheduleToDelete}
+        onOpenChange={(next) => !next && setScheduleToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this schedule?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {scheduleToDelete && (
+                <>
+                  This will permanently delete the schedule for{" "}
+                  <span className="font-medium text-foreground">
+                    {formatDateTime(scheduleToDelete.startDateTime)}
+                  </span>
+                  . This action cannot be undone.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={(e) => {
+                e.preventDefault();
+                if (scheduleToDelete) handleDelete(scheduleToDelete.id);
+              }}
+            >
+              {isDeleting ? "Deleting..." : "Yes, delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
