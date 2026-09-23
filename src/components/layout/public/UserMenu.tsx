@@ -22,7 +22,6 @@ export function UserMenu({ user }: UserMenuProps) {
   const { mutate: logout, isPending } = useLogout();
   const queryClient = useQueryClient();
 
-  // বাইরে ক্লিক করলে dropdown বন্ধ হবে
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {

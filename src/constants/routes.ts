@@ -10,5 +10,5 @@ export const dashboardRoute: Record<UserRole, string> = {
   SUPER_ADMIN: "/admin",
   ADMIN: "/admin",
   DOCTOR: "/doctor",
-  PATIENT: "/patient",
+  PATIENT: "/dashboard",
 };

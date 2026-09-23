@@ -1,4 +1,4 @@
-const prefix = "/patient";
+const prefix = "/dashboard";
 export const patientRoutes = [
   {
     title: "Analytics",
