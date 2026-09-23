@@ -48,6 +48,13 @@ export function useGetAllPublicDoctors(params: PublicDoctorParams) {
   });
 }
 
+export function useSuspenseGetPublicDoctors(params: PublicDoctorParams) {
+  return useSuspenseQuery({
+    queryKey: ["doctors", "public", params],
+    queryFn: () => getAllPublicDoctors(params),
+  });
+}
+
 export function usePublicDoctorProfile(doctorId: string) {
   return useQuery({
     queryKey: ["doctor", "public", doctorId],

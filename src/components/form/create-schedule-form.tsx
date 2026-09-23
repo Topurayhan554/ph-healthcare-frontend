@@ -10,12 +10,7 @@ import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar } from "../ui/calendar";
 import { useCreateSchedule } from "@/hooks";
-import {
-  scheduleSchema,
-  MINIMUM_SLOT_MINUTE,
-  MAXIMUM_SLOT_MINUTE,
-  slotMinutes,
-} from "@/validation";
+import { scheduleSchema, MINIMUM_SLOT_MINUTE, slotMinutes } from "@/validation";
 
 interface Props {
   onSuccess?: () => void;
@@ -202,10 +197,7 @@ export default function CreateScheduleForm({ onSuccess }: Props) {
                       const currentEnd = form.state.values.endTime;
                       if (currentEnd) {
                         const mins = slotMinutes(next, currentEnd);
-                        if (
-                          mins < MINIMUM_SLOT_MINUTE ||
-                          mins > MAXIMUM_SLOT_MINUTE
-                        ) {
+                        if (mins < MINIMUM_SLOT_MINUTE) {
                           form.setFieldValue("endTime", "");
                         }
                       }
@@ -226,10 +218,7 @@ export default function CreateScheduleForm({ onSuccess }: Props) {
                   const endOptions = startTime
                     ? TIME_OPTIONS.filter((t) => {
                         const mins = slotMinutes(startTime, t.value);
-                        return (
-                          mins >= MINIMUM_SLOT_MINUTE &&
-                          mins <= MAXIMUM_SLOT_MINUTE
-                        );
+                        return mins >= MINIMUM_SLOT_MINUTE;
                       })
                     : TIME_OPTIONS;
 

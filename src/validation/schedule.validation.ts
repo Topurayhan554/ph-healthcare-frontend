@@ -4,7 +4,6 @@ import z from "zod";
 //* endTime => 10:50
 
 export const MINIMUM_SLOT_MINUTE = 20;
-export const MAXIMUM_SLOT_MINUTE = 30;
 
 // https://meet.google.com/aiu-ctor-moh;
 
@@ -45,14 +44,6 @@ export const scheduleSchema = z
       slotMinutes(value.startTime, value.endTime) >= MINIMUM_SLOT_MINUTE,
     {
       message: `Slot time must be at least ${MINIMUM_SLOT_MINUTE} min`,
-      path: ["endTime"],
-    },
-  )
-  .refine(
-    (value) =>
-      slotMinutes(value.startTime, value.endTime) <= MAXIMUM_SLOT_MINUTE,
-    {
-      message: `Slot time must not exceed ${MAXIMUM_SLOT_MINUTE} min`,
       path: ["endTime"],
     },
   );
