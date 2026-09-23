@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 export const ROUTES = [
   { name: "Home", url: "/" },
   { name: "About Us", url: "/about-us" },
+  { name: "Doctors", url: "/doctors" },
 ];
 
 interface Props {

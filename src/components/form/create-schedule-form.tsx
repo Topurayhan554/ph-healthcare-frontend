@@ -105,6 +105,7 @@ export default function CreateScheduleForm({ onSuccess }: Props) {
       startTime: "",
       endTime: "",
       meetingLink: "https://meet.google.com/aiu-ctor-moh",
+      totalSlots: 1,
     },
     validators: {
       onSubmit: scheduleSchema,
@@ -116,6 +117,7 @@ export default function CreateScheduleForm({ onSuccess }: Props) {
         ).toISOString(),
         endDateTime: new Date(`${value.date}T${value.endTime}`).toISOString(),
         meetingLink: value.meetingLink,
+        totalSlots: value.totalSlots,
       };
 
       create(scheduleValue, {
@@ -270,6 +272,30 @@ export default function CreateScheduleForm({ onSuccess }: Props) {
                   onChange={(e) => field.handleChange(e.target.value)}
                   onBlur={field.handleBlur}
                   autoComplete="off"
+                  aria-invalid={isInvalid}
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        </form.Field>
+
+        <form.Field name="totalSlots">
+          {(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Total Slots</FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type="number"
+                  min={1}
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(Number(e.target.value))}
+                  onBlur={field.handleBlur}
                   aria-invalid={isInvalid}
                 />
                 {isInvalid && <FieldError errors={field.state.meta.errors} />}

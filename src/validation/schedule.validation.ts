@@ -31,6 +31,10 @@ export const scheduleSchema = z
         GOOGLE_MEET_REGEX,
         "Please provide a valid Google Meet link (e.g. https://meet.google.com/abc-defg-hij)",
       ),
+    totalSlots: z
+      .number()
+      .int("Total slots must be a whole number")
+      .min(1, "At least 1 slot is required"),
   })
   .refine((value) => value.startTime < value.endTime, {
     message: "End time must be after start time",
