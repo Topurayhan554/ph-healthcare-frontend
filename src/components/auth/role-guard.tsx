@@ -18,7 +18,7 @@ export default function RoleGuard({ children, roles }: IProps) {
 
   const user = data?.data;
 
-  console.log(user, "<-user");
+  // console.log(user, "<-user");
 
   const isAuthorized = !!user && roles.includes(user.role);
 

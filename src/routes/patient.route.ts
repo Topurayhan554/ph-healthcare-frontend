@@ -15,8 +15,8 @@ export const patientRoutes = [
     url: "#",
     items: [
       {
-        title: "Book Appointment",
-        url: `${prefix}/appointments/book`,
+        title: "My Appointment",
+        url: `${prefix}/my-appointments`,
       },
     ],
   },
